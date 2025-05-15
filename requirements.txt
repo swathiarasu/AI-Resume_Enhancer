@@ -1,0 +1,11 @@
+streamlit
+faiss-cpu
+transformers
+sentence-transformers
+PyMuPDF
+torch
+google.generativeai
+numpy
+tqdm
+kaggle
+pandas
