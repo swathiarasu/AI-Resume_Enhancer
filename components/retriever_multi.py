@@ -11,8 +11,10 @@ class MultiPDFRetriever:
             self.documents, self.metadata = pickle.load(f)
 
     def get_top_k(self, query, k=3):
-        query_vec = self.model.encode([query])[0]
-        D, I = self.index.search(np.array([query_vec]), k)
+        # Normalize the query so inner product == cosine, matching the index.
+        query_vec = np.ascontiguousarray(self.model.encode([query]), dtype=np.float32)
+        faiss.normalize_L2(query_vec)
+        D, I = self.index.search(query_vec, k)
         results = []
         for idx in I[0]:
             doc_text = self.documents[idx]

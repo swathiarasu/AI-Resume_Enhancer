@@ -53,11 +53,14 @@ print(f"📚 Generating embeddings for {len(documents)} chunks...")
 embeddings = []
 for chunk in tqdm(documents, desc="🔢 Embedding text"):
     embeddings.append(model.encode(chunk, convert_to_numpy=True))
-embeddings = np.stack(embeddings)
+embeddings = np.ascontiguousarray(np.stack(embeddings), dtype=np.float32)
 
-# Build FAISS index
-index = faiss.IndexFlatL2(embeddings.shape[1])
-index.add(np.array(embeddings))
+# Normalize so inner product == cosine similarity (bge-base-en-v1.5 expects cosine)
+faiss.normalize_L2(embeddings)
+
+# Build FAISS index (inner product on normalized vectors = cosine)
+index = faiss.IndexFlatIP(embeddings.shape[1])
+index.add(embeddings)
 
 # Save index and metadata
 os.makedirs(OUTPUT_DIR, exist_ok=True)

@@ -11,8 +11,8 @@ class LiveRetriever:
 
     def get_top_k_from_text(self, text, query, k=3):
         chunks = self.chunk_text(text)
-        chunk_embeddings = self.model.encode(chunks, convert_to_numpy=True)
-        query_vec = self.model.encode([query])[0]
-        scores = np.dot(chunk_embeddings, query_vec)  # cosine similarity
+        chunk_embeddings = self.model.encode(chunks, convert_to_numpy=True, normalize_embeddings=True)
+        query_vec = self.model.encode([query], convert_to_numpy=True, normalize_embeddings=True)[0]
+        scores = np.dot(chunk_embeddings, query_vec)  # cosine similarity (both sides normalized)
         top_k_idx = np.argsort(scores)[::-1][:k]
-        return [(i, chunks[i]) for i in top_k_idx]
+        return [(int(i), chunks[i]) for i in top_k_idx]
