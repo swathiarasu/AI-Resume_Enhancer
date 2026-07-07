@@ -4,7 +4,13 @@ import os
 
 class RAGModel:
     def __init__(self, model_name="models/gemini-2.5-flash-preview-04-17"):
-        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "GEMINI_API_KEY is not set. Export it before running the app, e.g. "
+                "`export GEMINI_API_KEY=your-key` (or pass it via Docker `-e GEMINI_API_KEY=...`)."
+            )
+        genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel(model_name)
 
     def generate_answer(self, question, context):
